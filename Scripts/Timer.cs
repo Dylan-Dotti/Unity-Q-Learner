@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class TimeEventEmitter : MonoBehaviour
+public class Timer : MonoBehaviour
 {
-    public static TimeEventEmitter Instance { get; private set; }
+    public static Timer Instance { get; private set; }
 
     public UnityAction PeriodicTimeEvent;
 

@@ -9,7 +9,7 @@ public class GridSquareFourWay : GridSquare
         Action.Up, Action.Down, Action.Left, Action.Right
     };
 
-    public override IQLearningState GetNextState(Action action)
+    public override GridSquare GetNextSquare(Action action)
     {
         int newRow = Row, newCol = Col;
         switch (action)
@@ -34,6 +34,6 @@ public class GridSquareFourWay : GridSquare
             return this;
         }
         GridSquare newSquare = ParentGrid.GetSquareAt(newRow, newCol);
-        return newSquare.Walkable ? newSquare : this;
+        return newSquare == null ? this : newSquare.Walkable ? newSquare : this;
     }
 }

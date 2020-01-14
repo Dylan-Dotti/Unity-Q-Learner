@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridSquareAgentSpawn : GridSquareFourWay
 {
-    [SerializeField] private QLearningAgent agentPrefab;
+    [SerializeField] private GridNavigator navigatorPrefab;
 
     private void Start()
     {
@@ -13,7 +13,7 @@ public class GridSquareAgentSpawn : GridSquareFourWay
 
     public void SpawnAgent()
     {
-        QLearningAgent agent = Instantiate(agentPrefab);
-        agent.SpawnAtState(this);
+        GridNavigator navAgent = Instantiate(navigatorPrefab);
+        navAgent.SpawnAtSquare(this);
     }
 }

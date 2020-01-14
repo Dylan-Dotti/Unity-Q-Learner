@@ -1,7 +1,7 @@
 ﻿
 public enum Action
 {
-    Up, Down, Left, Right, Exit, None
+    Up, Down, Left, Right, Interact, None
 }
 
 static class ActionMethods

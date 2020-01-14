@@ -18,9 +18,9 @@ public class QValueText : MonoBehaviour
 
     private void Update()
     {
-        if (syncedSquare.QValues.ContainsKey(syncedAction))
-        {
-            textComponent.text = syncedSquare.QValues[syncedAction].ToString("F2");
-        }
+        //if (syncedSquare.QValues.ContainsKey(syncedAction))
+        //{
+        //    textComponent.text = syncedSquare.QValues[syncedAction].ToString("F2");
+        //}
     }
 }

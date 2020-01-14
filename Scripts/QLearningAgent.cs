@@ -5,71 +5,96 @@ using UnityEngine;
 
 public class QLearningAgent : MonoBehaviour
 {
+    public float Epsilon { get => epsilon; set => epsilon = value; }
+
     [SerializeField][Range(0, 1)] private float epsilon;
 
-    public IQLearningState OccupiedState { get; private set; }
-    public IQLearningState SpawnState { get; private set; }
-    public ICollection<float> RewardBuffer { get; private set; }
+    private State currentState;
+    private ICollection<float> rewardBuffer;
+    private QValueManager qManager;
 
     private void Awake()
     {
-        RewardBuffer = new List<float>();
+        rewardBuffer = new List<float>();
+        qManager = new QValueManager();
     }
 
     private void Start()
     {
-        TimeEventEmitter.Instance.PeriodicTimeEvent += 
-            TransitionToNextState;
+        EpsilonDisplay.Instance.trackedAgent = this;
     }
 
-    public void SpawnAtState(IQLearningState spawnState)
+    public void ResetAgent()
     {
-        SpawnState = spawnState;
-        MoveToState(spawnState);
+        currentState = null;
+        rewardBuffer.Clear();
+        qManager.ClearStates();
     }
 
-    public void Despawn()
+    public void SpawnAtState(State spawnState)
     {
-        RemoveFromOccupiedState();
-        gameObject.SetActive(false);
+        EnterState(spawnState, true);
+        rewardBuffer.Clear();
     }
 
-    public void TransitionToNextState()
+    public void UpdateState(State newState, Action lastAction)
     {
-        IQLearningState prevState = OccupiedState;
-        Action selectedAction = Random.Range(0f, 1f) > epsilon ?
-            OccupiedState.GetMaxValueAction() : OccupiedState.GetRandomAction();
-        IQLearningState nextState = OccupiedState.GetNextState(selectedAction);
-        MoveToState(nextState ?? SpawnState);
-        float totalRewards = RewardBuffer.Sum();
-        prevState.UpdateQValue(selectedAction, totalRewards, nextState == null ?
-            0 : nextState.GetMaxQValue());
-        RewardBuffer.Clear();
-
+        State prevState = currentState;
+        TransitionToState(newState);
+        float totalReward = rewardBuffer.Sum();
+        rewardBuffer.Clear();
+        StateTransition transition = new StateTransition(
+            prevState, lastAction, currentState);
+        qManager.UpdateQValue(transition, totalReward);
     }
 
-    public void MoveToState(IQLearningState state)
+    public Action GetNextAction()
     {
-        AddToState(state);
-        transform.position = state.GetAgentPosition(1);
-    }
-
-    private void AddToState(IQLearningState state)
-    {
-        RemoveFromOccupiedState();
-        OccupiedState = state;
-        state.Occupant = this;
-        state.OnAgentEntered(this);
-    }
-
-    private void RemoveFromOccupiedState()
-    {
-        if (OccupiedState != null)
+        if (Random.Range(0f, 1f) < epsilon)
         {
-            IQLearningState prevState = OccupiedState;
-            OccupiedState.Occupant = null;
-            OccupiedState = null;
-            prevState.OnAgentExited(this);
+            return currentState.GetRandomAction();
+        }
+        return qManager.GetMaxValueAction(currentState);
+    }
+
+    public void ReceiveReward(float reward)
+    {
+        rewardBuffer.Add(reward);
+    }
+
+    private void TransitionToState(State newState)
+    {
+        ExitCurrentState();
+        EnterState(newState);
+    }
+
+    private void EnterState(State newState, bool isSpawning=false)
+    {
+        currentState = newState;
+        if (currentState != null)
+        {
+            qManager.AttemptAddState(currentState);
+            if (!isSpawning)
+            {
+                currentState.OnAgentEntered(this);
+            }
+            /*string qvStr = "";
+            foreach (Action a in currentState.Actions)
+            {
+                qvStr += string.Format("{0} : {1}{2}",
+                    a, qManager.GetQValue(currentState, a), System.Environment.NewLine);
+            }
+            Debug.Log("State Q Values: " + System.Environment.NewLine + qvStr);*/
+        }
+    }
+
+    private void ExitCurrentState()
+    {
+        if (currentState != null)
+        {
+            State temp = currentState;
+            currentState = null;
+            temp.OnAgentExited(this);
         }
     }
 }

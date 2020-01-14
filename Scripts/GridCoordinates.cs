@@ -19,4 +19,9 @@ public class GridCoordinates
     {
         return Row == otherCoords.Row && Col == otherCoords.Col;
     }
+
+    public override string ToString()
+    {
+        return string.Format("GridCoordinates({0}, {1})", Row, Col);
+    }
 }

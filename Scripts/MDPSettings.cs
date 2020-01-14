@@ -8,6 +8,7 @@ public class MDPSettings : MonoBehaviour
 
     [SerializeField] [Range(0, 1)] private float discountFactor = 0.9f;
     [SerializeField] [Range(0, 1)] private float learningRate = 0.9f;
+    [SerializeField] private float livingReward;
 
     public float DiscountFactor
     {
@@ -19,6 +20,12 @@ public class MDPSettings : MonoBehaviour
     {
         get => learningRate;
         set => learningRate = Mathf.Clamp01(value);
+    }
+
+    public float LivingReward
+    {
+        get => livingReward;
+        set => livingReward = value;
     }
 
     private void Awake()

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GridSquareFactory : MonoBehaviour
 {
@@ -9,6 +7,8 @@ public class GridSquareFactory : MonoBehaviour
     [SerializeField] private GridSquareFourWay fourWaySquarePrefab;
     [SerializeField] private GridSquareWall wallSquarePrefab;
     [SerializeField] private GridSquareAgentSpawn spawnSquarePrefab;
+    [SerializeField] private GridSquareButton buttonSquarePrefab;
+    [SerializeField] private GridSquareDoor doorSquarePrefab;
     [SerializeField] private GridSquareExit exitSquarePrefab;
 
     private void Awake()
@@ -32,6 +32,20 @@ public class GridSquareFactory : MonoBehaviour
     public GridSquareAgentSpawn GetSpawnSquare()
     {
         return Instantiate(spawnSquarePrefab);
+    }
+
+    public GridSquareButton GetButtonSquare()
+    {
+        return Instantiate(buttonSquarePrefab);
+    }
+
+    public GridSquareDoor GetDoorSquare(
+        GridSquareDoor.Orientation orient, bool openByDefault=false)
+    {
+        GridSquareDoor door = Instantiate(doorSquarePrefab);
+        door.Orient = orient;
+        door.OpenByDefault = openByDefault;
+        return door;
     }
 
     public GridSquareExit GetExitSquare(float exitReward)
